@@ -4,6 +4,15 @@ var Verify = require('./verify');
 var passport = require('passport');
 var User     = require('../models/user');
 
+
+
+// Home Page =================================================
+
+router.get('/', function(req, res){
+        res.render('index.ejs');
+    });
+    
+
 // Home Page with User Login Options =========================
 router.get('/users', Verify.verifyAdminUser, function(req, res, next) {
 
@@ -57,6 +66,10 @@ router.post('/login', function(req,res,next){
 
 
 //Sign up Page with the email & Address ======================
+
+router.get('/signup', function(req,res,next){
+    res.render('signup.ejs');
+});
 
 router.post('/signup', function(req, res) {
     User.register(new User({ username : req.body.username }),

@@ -6,7 +6,7 @@ var port         = process.env.PORT || 8080;
 var logger       = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser   = require('body-parser');
-//var flash        = require('connect-flash');
+var flash        = require('connect-flash');
 var mongoose     = require('mongoose');
 var passport     = require('passport');
 var LocalStrategy  = require('passport-local').Strategy;
@@ -14,7 +14,9 @@ var LocalStrategy  = require('passport-local').Strategy;
 var configDB     = require('./config/database');
 
 var users       = require('./routes/users');
-var items        = require('./routes/items');    
+var items       = require('./routes/items');
+var orders      = require('./routes/orders');
+//var profiles    = require('./routes/profiles'); 
 
 
 // Connecting the MongoDB Database (HC) & Passport--------------------------------------------------------------------------------
@@ -33,6 +35,7 @@ db.once('open', function(){
 //require('./config/passport')(passport);                            // pass passport for configuration
 
 
+
 // Setup Express Application ==========================================================================================
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -42,7 +45,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
+app.use(flash()); 
 
 
 // Passport Setup =====================================================================================================
@@ -52,19 +55,20 @@ app.use(passport.initialize());
 app.use(passport.session());
 passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());    
+passport.deserializeUser(User.deserializeUser());  
 
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
-
+app.set('view engine', 'ejs');
 
 
 // Defining the Routes ================================================================================================ 
 
 app.use('/', users);
+//app.use('/profile' profiles);
 app.use('/items', items);
+app.use('/orders', orders);
 /*require('./routes/profiles')(app,passport);
 require('./routes/items')(app, passport);
 require('./routes/orders')(app,passport);
@@ -86,7 +90,7 @@ app.use(function(err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
-
+  console.log(err);    
   // render the error page
   res.status(err.status || 500);
   res.render('error');
